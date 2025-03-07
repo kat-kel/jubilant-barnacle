@@ -14,7 +14,9 @@ class CreativeWork(BaseModel):
     created: datetime.datetime
     deposit_delay_days: int
     has_refs: bool
+    # Default to None because this is unknown to Crossref
     citations_incoming: typing.Optional[int] = None
+    # Default to 0 because this is known to Crossref
     citations_outgoing: int = 0
     member: typing.Optional[str] = None
     work_type: typing.Optional[str] = None
@@ -25,7 +27,7 @@ class CreativeWork(BaseModel):
         return datetime.datetime.fromisoformat(s)
 
     @classmethod
-    def load_json(cls, item: dict) -> "CreativeWork":
+    def load_json(cls, item: dict, has_refs: bool) -> "CreativeWork":
         try:
             doi = item["DOI"]
             work_type = item.get("type")
@@ -34,10 +36,6 @@ class CreativeWork(BaseModel):
             member = item.get("member")
             deposited = cls.parse_date(item["deposited"])
             citations_outgoing = item.get("references-count")
-            if citations_outgoing:
-                has_refs = True
-            else:
-                has_refs = False
             deposit_delay_days = (deposited - created).days
 
         # If the parsing fails, log the invalid data and abort the process.

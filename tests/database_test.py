@@ -32,7 +32,10 @@ class DatabaseTest(unittest.TestCase):
         Insert 2 rows into the 'creativework' table, each with member '3884'.
         """
         results_query = f"SELECT * FROM {CreativeWork.name_table()}"
-        records = [CreativeWork.load_json(ITEM), CreativeWork.load_json(ITEM)]
+        records = [
+            CreativeWork.load_json(ITEM, has_refs=False),
+            CreativeWork.load_json(ITEM, has_refs=False),
+        ]
         self.db.insert_records(records=records)
         result = self.db.client.query(results_query)
         rows = [r for r in result.named_results()]

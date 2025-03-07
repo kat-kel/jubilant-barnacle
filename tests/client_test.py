@@ -28,12 +28,11 @@ class ClientTest(unittest.TestCase):
         responses = []
         with Progress(BarColumn(), TimeElapsedColumn()) as p:
             t = p.add_task("", total=N)
-            for response in self.client.get_samples(has_references=True, n=N):
+            for records in self.client.get_samples(has_references=True, n=N):
                 # Affirm that the returned sample has 100 items
-                items = response["message"]["items"]
-                self.assertEqual(len(items), 100)
+                self.assertEqual(len(records), 100)
                 # Append the response to a list
-                responses.append(response)
+                responses.append(records)
                 p.advance(t)
         # Affirm the list of responses has 2 objects
         self.assertEqual(len(responses), N)

@@ -59,7 +59,7 @@ class ModelTest(unittest.TestCase):
         The created datetime occurs earlier in the day than deposit datetime.
         This should make the difference between the dates equal to 365.
         """
-        model = CreativeWork.load_json(ITEM1)
+        model = CreativeWork.load_json(item=ITEM1, has_refs=False)
         actual = model.deposit_delay_days
         expected = 365
         self.assertEqual(actual, expected)
@@ -69,7 +69,7 @@ class ModelTest(unittest.TestCase):
         The created datetime occurs later in the day than deposit datetime.
         This should add an extra day to the difference between the dates.
         """
-        model = CreativeWork.load_json(ITEM2)
+        model = CreativeWork.load_json(item=ITEM2, has_refs=False)
         actual = model.deposit_delay_days
         expected = 366
         self.assertEqual(actual, expected)

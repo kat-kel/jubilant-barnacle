@@ -72,15 +72,12 @@ def collect(mailto, samples, has_references):
         t = p.add_task("Collecting samples", total=samples)
 
         # Run the multi-threaded API calls
-        for response in client.get_samples(
+        for records in client.get_samples(
             has_references=has_references,
             n=samples,
         ):
             # Refresh the stdout log
             console.refresh()
-            # Parse the API response
-            items = response["message"]["items"]
-            records = [CreativeWork.load_json(i) for i in items]
             # Insert the sample's data into the table
             db.insert_records(records=records)
             p.advance(t)

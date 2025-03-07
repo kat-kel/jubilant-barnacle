@@ -2,6 +2,8 @@ import os
 
 from minet.executors import HTTPThreadPoolExecutor
 
+from src.api.models.work import CreativeWork
+
 BASE = "https://api.crossref.org/works?sample=100"
 SELECT_FILTER = "&select=DOI%2Cmember%2Cdeposited%2Ccreated%2Ctype%2Creferences-count%2Cis-referenced-by-count"
 
@@ -12,7 +14,8 @@ class Client:
         __init__ _summary_
 
         Args:
-            mailto (str | None, optional): The email address to add to the . Defaults to None.
+            mailto (str | None, optional): The email address to add to the \
+                URL. Defaults to None.
         """
         if not mailto:
             mailto = os.environ.get("MAILTO")
@@ -35,4 +38,11 @@ class Client:
         urls = [url] * n
         with HTTPThreadPoolExecutor() as executor:
             for result in executor.request(urls):
-                yield result.response.json()
+                if result.response.status == 200:
+                    # Parse the API response
+                    items = result.response.json()["message"]["items"]
+                    records = [
+                        CreativeWork.load_json(item=i, has_refs=has_references)
+                        for i in items
+                    ]
+                    yield records
