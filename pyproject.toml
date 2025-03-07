@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crossref"
+dynamic = ["version"]
+license = { file = "LICENSE" }
+dependencies = [
+    "click>=8.1.8",
+    "clickhouse-connect>=0.8.15",
+    "minet>=4.0.0",
+    "requests>=2.32.3",
+    "rich>=13.9.4"
+]
+
+[project.optional-dependencies]
+dev = ["black", "isort", "pytest"]
+
+[tool.setuptools.dynamic]
+version = {attr = "src.VERSION"}
+
+[project.scripts]
+crossref-api = "src.api.__main__:cli"
+
+[tool.setuptools.packages.find]
+where = [".", "src"]
