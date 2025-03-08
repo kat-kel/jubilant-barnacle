@@ -2,6 +2,8 @@ import unittest
 
 from src.api.database import ClickHouseDB
 from src.api.models.work import CreativeWork
+from src.api.models.member import CrossrefMember
+from src.api.cli.insert_members import get_unique_members
 
 ITEM = {
     "DOI": "10.5840/ancientphil201434222",
@@ -16,6 +18,22 @@ ITEM = {
     "references-count": 0,
     "is-referenced-by-count": 2,
 }
+
+
+class SelectMembersTest(unittest.TestCase):
+    def setUp(self):
+        self.db = ClickHouseDB(database_name="testdb")
+        self.db.recreate_table(table=CrossrefMember, prompt=False)
+        self.db.recreate_table(table=CreativeWork, prompt=False)
+        records = [
+            CreativeWork.load_json(ITEM, has_refs=False),
+        ]
+        self.db.insert_records(records=records)
+
+    def test_get_unique_members(self):
+        actual = get_unique_members(db=self.db)
+        expected = ["3884"]
+        self.assertListEqual(actual, expected)
 
 
 class DatabaseTest(unittest.TestCase):

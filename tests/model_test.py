@@ -1,6 +1,8 @@
+import json
 import unittest
 from pathlib import Path
 
+from src.api.models.member import CrossrefMember
 from src.api.models.work import CreativeWork
 
 JSON = Path(__file__).parent.joinpath("works.json")
@@ -34,6 +36,9 @@ ITEM2 = {
     "references-count": 0,
     "is-referenced-by-count": 2,
 }
+
+with open(Path(__file__).parent.joinpath("member_result.json")) as f:
+    MEMBER = json.load(f)
 
 
 class ModelTest(unittest.TestCase):
@@ -88,6 +93,34 @@ class ModelTest(unittest.TestCase):
         attribute_type = CreativeWork.__annotations__["citations_incoming"]
         actual = CreativeWork.__column_type_name__(dtype=attribute_type)
         expected = "Nullable(Int64)"
+        self.assertEqual(actual, expected)
+
+    def test_class_float_attribute_conversion_to_sql(self):
+        """
+        The required float attributes of the dataclass should return a type \
+            of 'Float64' for the ClickHouse database.
+        """
+        attribute_type = CrossrefMember.__annotations__["references_current"]
+        actual = CrossrefMember.__column_type_name__(dtype=attribute_type)
+        expected = "Float64"
+        self.assertEqual(actual, expected)
+
+    def test_member_year_breakdowns_parsing(self):
+        """
+        From the breakdown of years and deposits, which is a list of tuples, \
+            the earliest year and the latest year should be parsed.
+        """
+        model = CrossrefMember.load_json(message=MEMBER["message"])
+        actual = model.creation_earliest
+        expected = 1902
+        self.assertEqual(actual, expected)
+
+        actual = model.creation_latest
+        expected = 2018
+        self.assertEqual(actual, expected)
+
+        actual = model.creation_mean
+        expected = 1991
         self.assertEqual(actual, expected)
 
 

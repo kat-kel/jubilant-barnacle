@@ -34,7 +34,7 @@ def collect(mailto, samples, has_references):
     required=True,
 )
 def export(table: str, outfile: str):
-    export_table(table=table, outfile=outfile)
+    export_table(table_choice=table, outfile=outfile)
 
 
 if __name__ == "__main__":
