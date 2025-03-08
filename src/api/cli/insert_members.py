@@ -30,6 +30,7 @@ SELECT DISTINCT(w."member")
 FROM {works} w
 LEFT JOIN {members} m ON w.`member` = m.id
 WHERE m.id  = ''
+ORDER BY w."member"
 """
     result = db.client.query(query=query)
     return [row[0] for row in result.result_rows]

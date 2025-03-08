@@ -9,6 +9,7 @@ license = { file = "LICENSE" }
 dependencies = [
     "click>=8.1.8",
     "clickhouse-connect>=0.8.15",
+    "duckdb>=1.2.1",
     "minet>=4.0.0",
     "pyarrow>=19.0.1",
     "requests>=2.32.3",
@@ -17,12 +18,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["black", "isort", "pytest"]
+jup = ["jupyterlab", "seaborn"]
 
 [tool.setuptools.dynamic]
 version = {attr = "src.VERSION"}
 
 [project.scripts]
 crossref-api = "src.api.__main__:cli"
+crossref-duck = "src.analysis.main:main"
 
 [tool.setuptools.packages.find]
 where = [".", "src"]

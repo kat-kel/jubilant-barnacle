@@ -15,17 +15,18 @@ class CrossrefMember(BaseModel):
     id: str  # id
     name: str  # primary-name
     total_dois: int  # counts.total-dois
-    creation_pvariance: float
-    creation_mean: int
-
-    # breakdowns.dois-by-issued-year[-1]
-    creation_earliest: int
-
-    # breakdowns.dois-by-issued-year[0]
-    creation_latest: int
 
     # coverage.references-current
     references_current: float
+
+    # breakdowns.dois-by-issued-year[-1]
+    creation_earliest: typing.Optional[int] = None
+
+    # breakdowns.dois-by-issued-year[0]
+    creation_latest: typing.Optional[int] = None
+
+    creation_pvariance: typing.Optional[float] = None
+    creation_mean: typing.Optional[int] = None
 
     # counts-type.all.journal-article
     journal_articles: typing.Optional[int] = 0
@@ -45,16 +46,22 @@ class CrossrefMember(BaseModel):
             total_dois = message["counts"]["total-dois"]
 
             year_counts = message["breakdowns"]["dois-by-issued-year"]
-            earliest_creation = year_counts[-1][0]
-            latest_creation = year_counts[0][0]
+            if len(year_counts) > 0:
+                earliest_creation = year_counts[-1][0]
+                latest_creation = year_counts[0][0]
 
-            years = []
-            for y, c in year_counts:
-                years.extend([y] * c)
-            creation_year_mean = int(
-                round(statistics.geometric_mean(years), 0),
-            )
-            creation_year_pvariance = statistics.pvariance(years)
+                years = []
+                for y, c in year_counts:
+                    years.extend([y] * c)
+                creation_year_mean = int(
+                    round(statistics.geometric_mean(years), 0),
+                )
+                creation_year_pvariance = statistics.pvariance(years)
+            else:
+                earliest_creation = None
+                latest_creation = None
+                creation_year_mean = None
+                creation_year_pvariance = None
 
             count_types = message["counts-type"]["all"]
             journal_articles = count_types.get("journal-article")
@@ -63,12 +70,12 @@ class CrossrefMember(BaseModel):
 
             references_current = message["coverage"]["references-current"]
 
-        except KeyError as e:
+        except Exception as e:
             import json
 
             with open(INVALID_ITEM, "w") as f:
                 obj = {
-                    "key-error": e.args,
+                    "error": e.args,
                     "time": str(datetime.datetime.now()),
                     "item": message,
                 }
