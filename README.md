@@ -11,6 +11,10 @@ Exploration of the Crossref API and hypothesis about incoming citation counts re
   5. [Backup data / export tables](#5-backup-the-collected-data)
 
 - [Analyse data](#analyse-data)
+  
+  1. [Install Python dependencies](#1-install-notebook-dependencies)
+  2. [Load backups into DuckDB](#2-load-the-backed-up-data-into-duckdb)
+  3. [Launch Jupyter notebook](#3-develop-analyses-in-notebook)
 
 Credits to open-source projects used in this workflow:
 
@@ -108,7 +112,7 @@ crossref-api export-parquet --table member --outfile ./sampled-data/members.parq
 
 ## Analyse data
 
-### 1. Prepare analysis
+### 1. Install notebook dependencies
 
 Install the dependencies used for data analysis, namely `jupyterlab` and `seaborn`.
 
@@ -116,7 +120,9 @@ Install the dependencies used for data analysis, namely `jupyterlab` and `seabor
 pip install ".[jup]"
 ```
 
-Load the collected data into a DuckDB database file.
+### 2. Load the backed up data into DuckDB
+
+Load the backups of the collected data into a DuckDB database file.
 
 ```console
 $ crossref-duck --members sampled-data/members.parquet --works sampled-data/works.parquet --database sampled-data/crossref.duckdb
@@ -147,3 +153,7 @@ Rows: 18778
 
 Creating table ⠋ 0:00:00
 ```
+
+### 3. Develop analyses in notebook
+
+Launch `jupyter-lab` and begin analysing the sampled works and members data in the [notebook](./notebook.ipynb).
