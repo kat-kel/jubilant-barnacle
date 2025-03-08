@@ -70,7 +70,7 @@ Collecting samples ━━━━━━━━━━━━╸━━━━━━━�
 After the samples have been collected, run the command to collect metadata about the members that are included in the samples.
 
 ```shell
-crossref-api insert-members --matilto "my.email@mail.com"
+crossref-api insert-members
 ```
 
 ### 5. Backup the collected data
