@@ -8,13 +8,13 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 
-from src.analysis.constants import WORKS_TABLE
+from src.analysis.constants import WORKS_TABLE  # , MEMBERS_TABLE
 from src.analysis.utils import select_parquet_columns
 
 
-def load_table(
+def load_parquet_table(
     infile: str,
-    table: str,
+    table_name: str,
     conn: duckdb.DuckDBPyConnection,
 ) -> None:
     console = Console()
@@ -25,14 +25,15 @@ def load_table(
         TimeElapsedColumn(),
         console=console,
     ) as p:
-        _ = p.add_task("(Re)creating works table")
-        conn.execute(f"DROP TABLE IF EXISTS {table}")
-        selection = select_parquet_columns(table_name=WORKS_TABLE)
+        _ = p.add_task(f"(Re)creating table '{table_name}'")
+        conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+        selection = select_parquet_columns(table_name=table_name)
         create_stmt = f"""
-CREATE TABLE {table} AS SELECT {selection} FROM read_parquet('{infile}')"""
+CREATE TABLE {table_name} AS SELECT {selection} FROM read_parquet('{infile}')
+"""
         conn.execute(create_stmt)
-        console.print(f"Preview of table '{table}'", style="red")
-        print(conn.table(table).limit(2))
+        console.print(f"Preview of table '{table_name}'", style="red")
+        print(conn.table(table_name).limit(2))
 
 
 @click.command()
@@ -49,8 +50,8 @@ CREATE TABLE {table} AS SELECT {selection} FROM read_parquet('{infile}')"""
 def main(members: str, works: str, database: str):
     conn = duckdb.connect(database=database)
 
-    load_table(infile=works, table=WORKS_TABLE, conn=conn)
-    # load_table(infile=members, table=MEMBERS_TABLE, conn=conn)
+    load_parquet_table(infile=works, table_name=WORKS_TABLE, conn=conn)
+    # load_parquet_table(infile=members, table_name=MEMBERS_TABLE, conn=conn)
 
 
 if __name__ == "__main__":

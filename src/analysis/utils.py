@@ -1,8 +1,7 @@
-from src.analysis.constants import WORKS_TABLE
+from src.analysis.constants import MEMBERS_TABLE, WORKS_TABLE
 from src.api.models.base import BaseModel
+from src.api.models.member import CrossrefMember
 from src.api.models.work import CreativeWork
-
-# from src.api.models.member import CrossrefMember
 
 
 def list_date_cols(model: BaseModel) -> list[str]:
@@ -26,6 +25,17 @@ def list_date_cols(model: BaseModel) -> list[str]:
     ]
 
 
+def recast_columns(model: BaseModel) -> str:
+    cols = []
+    date_cols = list_date_cols(model=model)
+    for k in model.__annotations__.keys():
+        if k in date_cols:
+            cols.append(f"""strptime({k}, '%Y-%m-%d') AS {k}""")
+        else:
+            cols.append(k)
+    return ", ".join(cols)
+
+
 def select_parquet_columns(table_name: str) -> str:
     """
     Select and, when a date, recast the columns of the parquet file for \
@@ -37,14 +47,10 @@ def select_parquet_columns(table_name: str) -> str:
     Returns:
         str: Column portion of the query for selecting the parquet data.
     """
+
     if table_name == WORKS_TABLE:
-        cols = []
-        date_cols = list_date_cols(model=CreativeWork)
-        for k in CreativeWork.__annotations__.keys():
-            if k in date_cols:
-                cols.append(f"""strptime({k}, '%Y-%m-%d')""")
-            else:
-                cols.append(k)
-        return ", ".join(cols)
+        return recast_columns(model=CreativeWork)
+    elif table_name == MEMBERS_TABLE:
+        return recast_columns(model=CrossrefMember)
     else:
         raise ValueError("Invalid table name")
