@@ -47,6 +47,8 @@ def make_sure_outfile_is_parquet(outfile: str) -> Path:
 def build_query_for_selecting_distinct_rows(table: BaseModel) -> str:
     """
     Compose the select part of a query that ignores a table's duplicates rows.
+    Because ClickHouse stores and represents dates in Unix, convert hem to a \
+        date format.
 
     Args:
         table (BaseModel): Dataclass storing metadata about a table.
@@ -55,10 +57,28 @@ def build_query_for_selecting_distinct_rows(table: BaseModel) -> str:
         str: SQL select query.
     """
 
-    column_names = [f'"{k}"' for k in table.__annotations__.keys()]
-    columns = ", ".join(column_names)
+    # Patch for handling ClickHouse's date representations in Unix.
+    date_cols = [
+        c
+        for c, t in zip(
+            table.__annotations__.keys(),
+            table.list_column_type_names(),
+        )
+        if t == "DateTime"
+    ]
+
+    def reformat(col_name: str) -> str:
+        if col_name in date_cols:
+            return f"formatDateTime({col_name}, '%Y-%m-%d') AS {col_name}"
+        return col_name
+
+    column_names = ", ".join(
+        [f"{reformat(k)}" for k in table.__annotations__.keys()],
+    )
+    columns = ", ".join(table.__annotations__.keys())
     table_name = table.name_table()
-    return f"SELECT DISTINCT ON ({columns}) * FROM {table_name}"
+    query = f"SELECT DISTINCT ON ({columns}) {column_names} FROM {table_name}"
+    return query
 
 
 def fetch_unique_rows_in_pyarrow(
