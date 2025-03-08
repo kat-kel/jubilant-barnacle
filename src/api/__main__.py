@@ -1,6 +1,7 @@
 import click
 
 from src.api.cli.export_table import TABLE_CHOICES, export_table
+from src.api.cli.insert_members import insert_members
 from src.api.cli.insert_works import insert_works
 from src.api.database import ClickHouseDB
 from src.api.models.work import CreativeWork
@@ -18,11 +19,16 @@ def drop():
     db.recreate_table(table=CreativeWork)
 
 
+@cli.command("insert-members")
+def members():
+    insert_members()
+
+
 @cli.command("insert-samples")
 @click.option("--mailto", type=click.STRING)
 @click.option("--samples", type=click.INT, required=True)
 @click.option("--has-references", is_flag=True, default=False)
-def collect(mailto, samples, has_references):
+def works(mailto, samples, has_references):
     insert_works(mailto=mailto, samples=samples, has_references=has_references)
 
 

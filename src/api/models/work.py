@@ -73,7 +73,7 @@ class CreativeWork(BaseModel):
 
             with open(INVALID_ITEM, "w") as f:
                 obj = {
-                    "error": str(e),
+                    "key-error": e.args,
                     "time": str(datetime.datetime.now()),
                     "item": item,
                 }

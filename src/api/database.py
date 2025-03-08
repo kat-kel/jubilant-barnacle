@@ -40,6 +40,44 @@ CREATE DATABASE IF NOT EXISTS {database_name}
             database=database_name,
         )
 
+    def insert_single_record(self, record: BaseModel) -> None:
+        """
+        Insert 1 modelled data record into the relevant ClickHouse DB table. \
+            The data needs to be modelled according to a dataclass that \
+            inherits from my BaseModel class, which features methods to \
+            prepare the data for insertion into the databaes table.
+
+        Args:
+            records (BaseModel): An instance of a record's dataclass.
+        """
+
+        table = record.name_table()
+        data = [list(record.__dict__.values())]
+        column_names = list(record.__dict__.keys())
+        column_type_names = record.list_column_type_names()
+        try:
+            self.client.insert(
+                table=table,
+                data=data,
+                database=self.database_name,
+                column_names=column_names,
+                column_type_names=column_type_names,
+            )
+
+        # If the SQL command fails, log the invalid records and
+        # abort the process.
+        except Exception as e:
+            import json
+
+            with open(INVALID_RECORDS, "w") as f:
+                obj = {
+                    "error": str(e),
+                    "time": str(datetime.now()),
+                    "items": record.serialize(),
+                }
+                json.dump(obj, f, indent=4)
+            raise e
+
     def insert_records(self, records: list[BaseModel]) -> None:
         """
         Insert a list of modelled data into the relevant ClickHouse DB table. \
@@ -48,7 +86,7 @@ CREATE DATABASE IF NOT EXISTS {database_name}
             prepare the data for insertion into the databaes table.
 
         Args:
-            records (list[BaseModel]): _description_
+            records (list[BaseModel]): An instance of a record's dataclass.
         """
 
         model = records[0]
@@ -93,7 +131,7 @@ CREATE DATABASE IF NOT EXISTS {database_name}
         """
 
         q = f"Do you want to drop all the data in table \
-'{table.name_table()}'?"
+'{table.name_table()}' in database '{self.database_name}'?"
         if not prompt or click.prompt(q):
             stmt = table.create_drop_statement()
             self.client.command(stmt)

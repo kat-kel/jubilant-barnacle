@@ -3,9 +3,11 @@ from typing import Generator
 
 from minet.executors import HTTPThreadPoolExecutor
 
+from src.api.models.member import CrossrefMember
 from src.api.models.work import CreativeWork
 
-BASE = "https://api.crossref.org/works?sample=100"
+MEMBERS_BASE = "https://api.crossref.org/members/"
+WORKS_BASE = "https://api.crossref.org/works?sample=100"
 SELECT_FILTER = "&select=DOI%2Cmember%2Cdeposited%2Ccreated%2Ctype%2Creferences-count%2Cis-referenced-by-count"
 
 
@@ -31,6 +33,18 @@ class Client:
         else:
             self.mailto = ""
 
+    def build_members_endpoint(self, id: str) -> str:
+        """
+        Build the URI for collecting a specified member.
+
+        Args:
+            id (str): ID of the Crossref member.
+
+        Returns:
+            str: URI for the API request.
+        """
+        return f"{MEMBERS_BASE}{id}"
+
     def build_works_endpoint(self, has_references: bool) -> str:
         """
         Build the URI for collecting select metadata from samples of works. \
@@ -48,7 +62,18 @@ class Client:
             ref_filter += "1"
         else:
             ref_filter += "0"
-        return BASE + self.mailto + SELECT_FILTER + ref_filter
+        return WORKS_BASE + self.mailto + SELECT_FILTER + ref_filter
+
+    def get_members(
+        self, ids: list[str]
+    ) -> Generator[list[CrossrefMember], None, None]:
+        urls = [self.build_members_endpoint(id=id) for id in ids]
+        with HTTPThreadPoolExecutor() as executor:
+            for result in executor.request(urls):
+                if result.response.status == 200:
+                    # Parse the API response
+                    message = result.response.json()["message"]
+                    yield CrossrefMember.load_json(message=message)
 
     def get_samples(
         self,

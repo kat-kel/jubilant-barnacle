@@ -41,6 +41,8 @@ class BaseModel:
             return "DateTime"
         elif str(dtype) == "<class 'int'>":
             return "Int64"
+        elif str(dtype) == "<class 'float'>":
+            return "Float64"
         elif str(dtype) == "typing.Optional[int]":
             return "Nullable(Int64)"
         elif str(dtype) == "<class 'bool'>":
