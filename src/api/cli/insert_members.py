@@ -17,7 +17,20 @@ class NotEnoughDataException(Exception):
 
 
 def get_unique_members(db: ClickHouseDB) -> list[str]:
-    query = f"SELECT DISTINCT(c.member) FROM {CreativeWork.name_table()} c"
+    """
+    From the table of works, get a unique set of member IDs that have not yet \
+        been entered into the members table.
+    """
+
+    works = CreativeWork.name_table()
+    members = CrossrefMember.name_table()
+
+    query = f"""
+SELECT DISTINCT(w."member")
+FROM {works} w
+LEFT JOIN {members} m ON w.`member` = m.id
+WHERE m.id  = ''
+"""
     result = db.client.query(query=query)
     return [row[0] for row in result.result_rows]
 

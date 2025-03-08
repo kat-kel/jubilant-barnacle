@@ -12,7 +12,7 @@ INVALID_ITEM = LOG_DIR.joinpath("invalid_item.json")
 
 @dataclass
 class CrossrefMember(BaseModel):
-    id: int  # id
+    id: str  # id
     name: str  # primary-name
     total_dois: int  # counts.total-dois
     creation_pvariance: float
@@ -40,7 +40,7 @@ class CrossrefMember(BaseModel):
     def load_json(cls, message: dict) -> "CrossrefMember":
 
         try:
-            id = message["id"]
+            id = str(message["id"])
             name = message["primary-name"]
             total_dois = message["counts"]["total-dois"]
 

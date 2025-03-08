@@ -5,6 +5,7 @@ from src.api.cli.insert_members import insert_members
 from src.api.cli.insert_works import insert_works
 from src.api.database import ClickHouseDB
 from src.api.models.work import CreativeWork
+from src.api.models.member import CrossrefMember
 
 
 @click.group()
@@ -13,10 +14,15 @@ def cli():
 
 
 @cli.command("drop-works")
-def drop():
-    # Set up a connection to the ClickHouse database
+def drop_works():
     db = ClickHouseDB()
     db.recreate_table(table=CreativeWork)
+
+
+@cli.command("drop-members")
+def drop_members():
+    db = ClickHouseDB()
+    db.recreate_table(table=CrossrefMember)
 
 
 @cli.command("insert-members")
