@@ -20,7 +20,7 @@ def drop():
 
 @cli.command("insert-samples")
 @click.option("--mailto", type=click.STRING)
-@click.option("--samples", type=click.INT, reuired=True)
+@click.option("--samples", type=click.INT, required=True)
 @click.option("--has-references", is_flag=True, default=False)
 def collect(mailto, samples, has_references):
     insert_works(mailto=mailto, samples=samples, has_references=has_references)
