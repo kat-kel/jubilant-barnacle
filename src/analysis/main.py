@@ -8,7 +8,7 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 
-from src.analysis.constants import WORKS_TABLE  # , MEMBERS_TABLE
+from src.analysis.constants import WORKS_TABLE, MEMBERS_TABLE
 from src.analysis.utils import select_parquet_columns
 
 
@@ -34,6 +34,8 @@ CREATE TABLE {table_name} AS SELECT {selection} FROM read_parquet('{infile}')
         conn.execute(create_stmt)
         console.print(f"Preview of table '{table_name}'", style="red")
         print(conn.table(table_name).limit(2))
+        row_count = conn.table(table_name=table_name).count("*").fetchone()[0]
+        console.print(f"Rows: {row_count}")
 
 
 @click.command()
@@ -51,7 +53,7 @@ def main(members: str, works: str, database: str):
     conn = duckdb.connect(database=database)
 
     load_parquet_table(infile=works, table_name=WORKS_TABLE, conn=conn)
-    # load_parquet_table(infile=members, table_name=MEMBERS_TABLE, conn=conn)
+    load_parquet_table(infile=members, table_name=MEMBERS_TABLE, conn=conn)
 
 
 if __name__ == "__main__":

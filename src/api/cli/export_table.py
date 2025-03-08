@@ -107,7 +107,7 @@ def write_pyarrow_table_to_parquet(pyarrow_table: pa.Table, fp: Path) -> None:
 def export_table(table_choice: str, outfile: str):
     if table_choice == Works.choice:
         table = Works.table
-    elif table == Members.choice:
+    elif table_choice == Members.choice:
         table = Members.table
     else:
         raise ValueError("This table is not yet implemented")

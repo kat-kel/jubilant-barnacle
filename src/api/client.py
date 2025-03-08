@@ -70,7 +70,7 @@ class Client:
         urls = [self.build_members_endpoint(id=id) for id in ids]
         with HTTPThreadPoolExecutor() as executor:
             for result in executor.request(urls):
-                if result and result.response.status == 200:
+                if result and result.response and result.response.status == 200:
                     # Parse the API response
                     message = result.response.json()["message"]
                     yield CrossrefMember.load_json(message=message)
