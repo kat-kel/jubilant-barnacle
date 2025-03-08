@@ -107,3 +107,43 @@ crossref-api export-parquet --table member --outfile ./sampled-data/members.parq
 ```
 
 ## Analyse data
+
+### 1. Prepare analysis
+
+Install the dependencies used for data analysis, namely `jupyterlab` and `seaborn`.
+
+```shell
+pip install ".[jup]"
+```
+
+Load the collected data into a DuckDB database file.
+
+```console
+$ crossref-duck --members sampled-data/members.parquet --works sampled-data/works.parquet --database sampled-data/crossref.duckdb
+─────────────────────────────────── Table 'works' ───────────────────────────────────
+Rows: 1978118
+┌──────────────────────┬─────────────────────┬───┬─────────┬─────────────────┐
+│         doi          │      deposited      │ … │ member  │    work_type    │
+│       varchar        │      timestamp      │   │ varchar │     varchar     │
+├──────────────────────┼─────────────────────┼───┼─────────┼─────────────────┤
+│ 10.1002/ece3.70502   │ 2025-02-18 00:00:00 │ … │ 311     │ journal-article │
+│ 10.3389/fpsyt.2021…  │ 2024-09-19 00:00:00 │ … │ 1965    │ journal-article │
+├──────────────────────┴─────────────────────┴───┴─────────┴─────────────────┤
+│ 2 rows                                                 9 columns (4 shown) │
+└────────────────────────────────────────────────────────────────────────────┘
+
+Creating table ⠸ 0:00:01
+────────────────────────────────── Table 'members' ──────────────────────────────────
+Rows: 18778
+┌─────────┬──────────────────────┬───┬───────────────┬──────────────────────┐
+│   id    │         name         │ … │ book_chapters │ proceedings_articles │
+│ varchar │       varchar        │   │     int64     │        int64         │
+├─────────┼──────────────────────┼───┼───────────────┼──────────────────────┤
+│ 9052    │ Institute for Soci…  │ … │             0 │                    0 │
+│ 9523    │ International Asso…  │ … │             0 │                 4477 │
+├─────────┴──────────────────────┴───┴───────────────┴──────────────────────┤
+│ 2 rows                                               11 columns (4 shown) │
+└───────────────────────────────────────────────────────────────────────────┘
+
+Creating table ⠋ 0:00:00
+```

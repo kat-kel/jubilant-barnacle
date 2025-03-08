@@ -25,17 +25,17 @@ def load_parquet_table(
         TimeElapsedColumn(),
         console=console,
     ) as p:
-        _ = p.add_task(f"(Re)creating table '{table_name}'")
+        _ = p.add_task("Creating table")
         conn.execute(f"DROP TABLE IF EXISTS {table_name}")
         selection = select_parquet_columns(table_name=table_name)
         create_stmt = f"""
 CREATE TABLE {table_name} AS SELECT {selection} FROM read_parquet('{infile}')
 """
         conn.execute(create_stmt)
-        console.print(f"Preview of table '{table_name}'", style="red")
-        print(conn.table(table_name).limit(2))
+        console.rule(f"Table '{table_name}'")
         row_count = conn.table(table_name=table_name).count("*").fetchone()[0]
         console.print(f"Rows: {row_count}")
+        print(conn.table(table_name).limit(2))
 
 
 @click.command()
