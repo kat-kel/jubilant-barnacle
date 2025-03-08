@@ -20,7 +20,7 @@ Credits to open-source projects used in this workflow:
 |Apache Arrow|[`pyarrow`](https://arrow.apache.org/docs/python/index.html) Python API|data backup|Apache-2.0 License|
 |DuckDB|[`duckdb`](https://duckdb.org/docs/stable/clients/python/overview) Python API|OLAP database|MIT License|
 |Sciences Po, _médialab_|[`minet`](https://github.com/medialab/minet) Python library|multi-threaded API requests|GPL-3.0 License|
-|Textualize & Will McGugan|[`rich`](https://github.com/Textualize/rich) Python library|used for progress bar|MIT License|
+|Textualize & Will McGugan|[`rich`](https://github.com/Textualize/rich) Python library|CLI progress bar|MIT License|
 |Paletts|[`click`](https://github.com/pallets/click) Python library|command-line interface|BSD-3-Clause License|
 |Michael Waskom|[`seaborn`](https://github.com/mwaskom/seaborn) Python library| data visualisation|BSD-3-Clause License|
 
