@@ -25,11 +25,16 @@ class DatabaseTest(unittest.TestCase):
         self.db.recreate_table(table=CreativeWork, prompt=False)
 
     def test_create_table(self):
+        """
+        The database client should run the create table command without \
+            throwing an error, even though the table has already been created.
+        """
         self.db.create_table(table=CreativeWork)
 
     def test_insert_data(self):
         """
-        Insert 2 rows into the 'creativework' table, each with member '3884'.
+        The database client should insert 2 identical rows into the \
+            'creativework' table, thus each should have the same member (3884).
         """
         results_query = f"SELECT * FROM {CreativeWork.name_table()}"
         records = [

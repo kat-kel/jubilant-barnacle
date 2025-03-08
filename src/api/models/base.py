@@ -15,14 +15,28 @@ class BaseModel:
 
     @classmethod
     def name_table(cls) -> str:
+        """
+        Parse the name of the table / dataclass that inherits this base model.
+
+        Returns:
+            str: Name of the dataclass / table.
+        """
+
         return cls.__name__.lower()
 
     @staticmethod
     def __column_type_name__(dtype: typing.Any) -> str:
         """
-        Convert the type annotation of the class's attribute to a ClickHouse
-        data type.
+        Convert the type annotation of a class's attribute to the name of \
+            a ClickHouse data type.
+
+        Args:
+            dtype (typing.Any): The dataclass attribute's type.
+
+        Returns:
+            str: The name of a data type in ClickHouse.
         """
+
         if str(dtype) == "<class 'datetime.datetime'>" in str(dtype):
             return "DateTime"
         elif str(dtype) == "<class 'int'>":
@@ -38,10 +52,26 @@ class BaseModel:
 
     @classmethod
     def create_drop_statement(cls) -> str:
+        """
+        Compose a drop table statement for the table / dataclass that \
+            inherits this base model.
+
+        Returns:
+            str: SQL statement for dropping a table.
+        """
+
         return f"DROP TABLE IF EXISTS {cls.name_table()}"
 
     @classmethod
     def create_table_statement(cls) -> str:
+        """
+        Compose a create table statement for the table / dataclass that \
+            inherits this base model.
+
+        Returns:
+            str: SQL statement for creating a table.
+        """
+
         attrs = cls.__annotations__.items()
         cols = {n: cls.__column_type_name__(dtype) for n, dtype in attrs}
         c_string = ", ".join(f"{col} {dtype}" for col, dtype in cols.items())
@@ -53,5 +83,14 @@ CREATE TABLE IF NOT EXISTS {cls.name_table()}
 
     @classmethod
     def list_column_type_names(cls) -> list[str]:
+        """
+        Convert the types of the dataclass's attributes into their ClickHouse \
+            data type equivalents.
+
+        Returns:
+            list[str]: List of names in ClickHouse's syntax for the table / \
+                dataclass that inherits this base model.
+        """
+
         attrs = cls.__annotations__.items()
         return [cls.__column_type_name__(t) for _, t in attrs]

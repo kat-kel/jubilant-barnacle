@@ -35,22 +35,6 @@ ITEM2 = {
     "is-referenced-by-count": 2,
 }
 
-GRANT = {
-    "DOI": "10.3030/101095098",
-    "member": "4854",
-    "deposited": {
-        "date-parts": [[2023, 9, 7]],
-        "date-time": "2023-09-07T17:58:51Z",
-        "timestamp": 1694109531000,
-    },
-    "created": {
-        "date-parts": [[2023, 9, 7]],
-        "date-time": "2023-09-07T17:58:50Z",
-        "timestamp": 1694109530000,
-    },
-    "type": "grant",
-}
-
 
 class ModelTest(unittest.TestCase):
 
@@ -76,8 +60,9 @@ class ModelTest(unittest.TestCase):
 
     def test_class_string_attribute_conversion_to_sql(self):
         """
-        The required and optional string attributes of the dataclass should
-        return a type of 'String' for the ClickHouse database.
+        The required and optional string attributes of the dataclass should \
+            return a type of 'String' and 'Nullable(String)', respectively, \
+            for the ClickHouse database.
         """
         attribute_type = CreativeWork.__annotations__["doi"]
         actual = CreativeWork.__column_type_name__(dtype=attribute_type)
@@ -91,8 +76,9 @@ class ModelTest(unittest.TestCase):
 
     def test_class_int_attribute_conversion_to_sql(self):
         """
-        The required and optional integer attributes of the dataclass should
-        return a type of 'Int64' for the ClickHouse database.
+        The required and optional integer attributes of the dataclass should \
+            return a type of 'Int64' and 'Nullable(Int64)', respectively, for \
+            the ClickHouse database.
         """
         attribute_type = CreativeWork.__annotations__["citations_outgoing"]
         actual = CreativeWork.__column_type_name__(dtype=attribute_type)

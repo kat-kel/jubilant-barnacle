@@ -14,16 +14,23 @@ class ClientTest(unittest.TestCase):
     def setUp(self):
         self.client = Client(mailto=MAILTO)
 
-    def test_url(self):
-        actual = self.client.build_url(has_references=True)
+    def test_works_endpoint(self):
+        """
+        The client should build a URL that filters on whether or not works
+        have references.
+        """
+        actual = self.client.build_works_endpoint(has_references=True)
         expected = WITH_REFERENCES_URL
         self.assertEqual(actual, expected)
 
-        actual = self.client.build_url(has_references=False)
+        actual = self.client.build_works_endpoint(has_references=False)
         expected = WITHOUT_REFERENCES_URL
         self.assertEqual(actual, expected)
 
     def test_request(self):
+        """
+        The client should request and return 2 samples of 100 items each.
+        """
         N = 2
         responses = []
         with Progress(BarColumn(), TimeElapsedColumn()) as p:

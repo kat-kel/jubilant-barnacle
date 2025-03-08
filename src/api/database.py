@@ -1,8 +1,11 @@
 import click
 import clickhouse_connect
+from datetime import datetime
 
-from src import LOG_DIR
+from src.api.cli.logs import LOG_DIR
 from src.api.models.base import BaseModel
+
+INVALID_RECORDS = LOG_DIR.joinpath("invalid_records_chunk.json")
 
 
 class ClickHouseDB:
@@ -61,13 +64,19 @@ CREATE DATABASE IF NOT EXISTS {database_name}
                 column_names=column_names,
                 column_type_names=column_type_names,
             )
+
+        # If the SQL command fails, log the invalid records and
+        # abort the process.
         except Exception as e:
             import json
 
-            with open(LOG_DIR.joinpath("error.txt"), "w") as f:
-                f.write(str(e))
-            with open(LOG_DIR.joinpath("records_chunk.json"), "w") as f:
-                json.dump([r.serialize() for r in records], f, indent=4)
+            with open(INVALID_RECORDS, "w") as f:
+                obj = {
+                    "error": str(e),
+                    "time": str(datetime.now()),
+                    "items": [r.serialize() for r in records],
+                }
+                json.dump(obj, f, indent=4)
             raise e
 
     def recreate_table(self, table: BaseModel, prompt: bool = True) -> None:

@@ -1,4 +1,5 @@
 import os
+from typing import Generator
 
 from minet.executors import HTTPThreadPoolExecutor
 
@@ -9,13 +10,18 @@ SELECT_FILTER = "&select=DOI%2Cmember%2Cdeposited%2Ccreated%2Ctype%2Creferences-
 
 
 class Client:
+    """
+    High-level Python API client for the Crossref API and for collecting \
+        select data according to pre-defined models.
+    """
+
     def __init__(self, mailto: str | None = None) -> None:
         """
-        __init__ _summary_
+        Prepare for the client to specify a user-agent in the API call.
 
         Args:
             mailto (str | None, optional): The email address to add to the \
-                URL. Defaults to None.
+                URI. Defaults to None.
         """
         if not mailto:
             mailto = os.environ.get("MAILTO")
@@ -25,7 +31,18 @@ class Client:
         else:
             self.mailto = ""
 
-    def build_url(self, has_references: bool) -> str:
+    def build_works_endpoint(self, has_references: bool) -> str:
+        """
+        Build the URI for collecting select metadata from samples of works. \
+            The samples are defined by whether the work has references.
+
+        Args:
+            has_references (bool): Value of the API's has-references filter.
+
+        Returns:
+            str: URI for the API request.
+        """
+
         ref_filter = "&filter=has-references%3A"
         if has_references:
             ref_filter += "1"
@@ -33,8 +50,24 @@ class Client:
             ref_filter += "0"
         return BASE + self.mailto + SELECT_FILTER + ref_filter
 
-    def get_samples(self, has_references: bool, n: int = 10):
-        url = self.build_url(has_references=has_references)
+    def get_samples(
+        self,
+        has_references: bool,
+        n: int = 10,
+    ) -> Generator[list[CreativeWork], None, None]:
+        """
+        Collect samples of works from the API, and as each sample is \
+            returned, model the works' metadata and yeild the modelled batch.
+
+        Args:
+            has_references (bool): Value of the API's has-references filter.
+            n (int, optional): Number of samples. Defaults to 10.
+
+        Yields:
+            Generator[list[CreativeWork], None, None]: Modelled works metadata.
+        """
+
+        url = self.build_works_endpoint(has_references=has_references)
         urls = [url] * n
         with HTTPThreadPoolExecutor() as executor:
             for result in executor.request(urls):

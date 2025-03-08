@@ -2,9 +2,12 @@ import datetime
 import typing
 from dataclasses import dataclass
 
-from src import LOG_DIR
+from src.api.cli.logs import LOG_DIR
 
 from .base import BaseModel
+
+# Set up logs for a work's validation
+INVALID_ITEM = LOG_DIR.joinpath("invalid_item.json")
 
 
 @dataclass
@@ -13,11 +16,18 @@ class CreativeWork(BaseModel):
     deposited: datetime.datetime
     created: datetime.datetime
     deposit_delay_days: int
+
+    # This boolean needs to be provided alongside the item metadata because (to
+    # optimise API) references array is not selected and whether an item has an
+    # array of references is known only via the API call's filter parameter.
     has_refs: bool
-    # Default to None because this is unknown to Crossref
+
+    # Default to None because this metadata is unknown to Crossref
     citations_incoming: typing.Optional[int] = None
-    # Default to 0 because this is known to Crossref
+
+    # Default to 0 because this metadata is known to Crossref
     citations_outgoing: int = 0
+
     member: typing.Optional[str] = None
     work_type: typing.Optional[str] = None
 
@@ -28,6 +38,25 @@ class CreativeWork(BaseModel):
 
     @classmethod
     def load_json(cls, item: dict, has_refs: bool) -> "CreativeWork":
+        """
+        From the JSON response returned by the API, parse a work's metadata. \
+            To optimise the API call, the work's references array is not \
+            returned and whether it has an array of references is known only \
+            via the API call's filter parameter, so that metadata needs to be \
+            provided separately.
+
+            Args:
+                item (dict): JSON object of work's selected metadata.
+                has_refs (bool): Boolean used in API filter parameter.
+
+            Raises:
+                e: Key Error raised if metadata's formatting is invalid \
+                    according to the data model.
+
+            Returns:
+                CreativeWork: An instance of the CreativeWork dataclass model.
+        """
+
         try:
             doi = item["DOI"]
             work_type = item.get("type")
@@ -39,13 +68,16 @@ class CreativeWork(BaseModel):
             deposit_delay_days = (deposited - created).days
 
         # If the parsing fails, log the invalid data and abort the process.
-        except Exception as e:
+        except KeyError as e:
             import json
 
-            with open(LOG_DIR.joinpath("error.txt"), "w") as f:
-                f.write(str(e))
-            with open(LOG_DIR.joinpath("invalid_item.json"), "w") as f:
-                json.dump(item, f, indent=4)
+            with open(INVALID_ITEM, "w") as f:
+                obj = {
+                    "error": str(e),
+                    "time": str(datetime.datetime.now()),
+                    "item": item,
+                }
+                json.dump(obj, f, indent=4)
             raise e
 
         return CreativeWork(
