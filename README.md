@@ -12,6 +12,18 @@ Exploration of the Crossref API and hypothesis about incoming citation counts re
 
 - [Analyse data](#analyse-data)
 
+Credits to open-source projects used in this workflow:
+
+|author|project|use in workflow|license|
+|--|--|--|--|
+|ClickHouse|[local database](https://clickhouse.com/docs/operations/utilities/clickhouse-local) & [`clickhouse-connect`](https://clickhouse.com/docs/integrations/python) Python API|distributed database|Apache-2.0 License|
+|Apache Arrow|[`pyarrow`](https://arrow.apache.org/docs/python/index.html) Python API|data backup|Apache-2.0 License|
+|DuckDB|[`duckdb`](https://duckdb.org/docs/stable/clients/python/overview) Python API|OLAP database|MIT License|
+|Sciences Po, _médialab_|[`minet`](https://github.com/medialab/minet) Python library|multi-threaded API requests|GPL-3.0 License|
+|Textualize & Will McGugan|[`rich`](https://github.com/Textualize/rich) Python library|used for progress bar|MIT License|
+|Paletts|[`click`](https://github.com/pallets/click) Python library|command-line interface|BSD-3-Clause License|
+|Michael Waskom|[`seaborn`](https://github.com/mwaskom/seaborn) Python library| data visualisation|BSD-3-Clause License|
+
 ---
 
 ## Collect data
@@ -69,8 +81,9 @@ Collecting samples ━━━━━━━━━━━━╸━━━━━━━�
 
 After the samples have been collected, run the command to collect metadata about the members that are included in the samples.
 
-```shell
-crossref-api insert-members
+```console
+$ crossref-api insert-members
+Collecting members ━━━━━━━━━╺━━━  750/1000 0:17:43
 ```
 
 ### 5. Backup the collected data
@@ -81,9 +94,9 @@ The data inserted into the ClickHouse database is stored in a folder where the s
 clickhouse/data/crossref/creativework/ -> clickhouse/store/8ca/8cac4d5e-620a-4ee0-9dc3-6199fdefc23f
 ```
 
-In case we uninstall / delete the ClickHouse local software, and thus delete the `data/` and `/store` folders, we need to back up our data in an open-source file format, such as parquet.
+In case we uninstall / delete the ClickHouse local software, and thus delete the `data/` and `/store` folders, we need to back up our data.
 
-Run the export command for each table, specifying the name and location of the parquet file with which you want to work.
+Run the export command for each table, specifying the name and location of the parquet file with which you want to work during the data analysis.
 
 ```shell
 crossref-api export-parquet --table creativework --outfile ./sampled-data/works.parquet
