@@ -7,16 +7,22 @@ from rich.progress import (
 )
 
 from src.api.cli.console import ConsoleLog
+from src.api.constants import CLICKHOUSE_DATABASE
 from src.api.client import Client
 from src.api.database import ClickHouseDB
 from src.api.models.work import CreativeWork
 
 
-def insert_works(mailto: str | None, samples: int, has_references: bool):
+def insert_works(
+    mailto: str | None,
+    samples: int,
+    has_references: bool,
+    database: str = CLICKHOUSE_DATABASE,
+):
     # Set up the client for calling the Crossref API
     client = Client(mailto=mailto)
     # Set up a connection to the ClickHouse database
-    db = ClickHouseDB()
+    db = ClickHouseDB(database_name=database)
     # Set up a stdout log for the console
     console = ConsoleLog(db=db, refs=has_references)
     # Affirm that the table for inserting values is created

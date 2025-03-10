@@ -73,7 +73,6 @@ class SelectMembersTest(unittest.TestCase):
         self.db.recreate_table(table=CrossrefMember, prompt=False)
         self.db.recreate_table(table=CreativeWork, prompt=False)
 
-    @unittest.skip("")
     def test_no_existing_member_data(self):
         # Insert 3 works with 2 unique members into the works table.
         # Do not insert anything in the members table.
@@ -97,7 +96,6 @@ class SelectMembersTest(unittest.TestCase):
         self.assertListEqual(actual, expected)
 
 
-@unittest.skip("")
 class DatabaseTest(unittest.TestCase):
 
     def setUp(self):

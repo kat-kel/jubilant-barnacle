@@ -1,25 +1,27 @@
-import click
-import clickhouse_connect
 from datetime import datetime
 
+import click
+import clickhouse_connect
+
 from src.api.cli.logs import LOG_DIR
+from src.api.constants import CLICKHOUSE_HOST, CLICKHOUSE_PORT
 from src.api.models.base import BaseModel
 
 INVALID_RECORDS = LOG_DIR.joinpath("invalid_records_chunk.json")
 
 
 class ClickHouseDB:
-    host = "localhost"
-    port = 8123
+    host = CLICKHOUSE_HOST
+    port = CLICKHOUSE_PORT
 
-    def __init__(self, database_name: str = "crossref") -> None:
+    def __init__(self, database_name: str) -> None:
         """
         Create an instance of the clickhouse-connect client. If the database \
             is not already created, create the database.
 
         Args:
             database_name (str): Name of the database in the ClickHouse \
-                server instance. Defaults to 'crossref'.
+                server instance.
         """
         # Ensure the database is created
         self.database_name = database_name

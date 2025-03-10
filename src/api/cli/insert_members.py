@@ -6,6 +6,7 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 from src.api.client import Client
+from src.api.constants import CLICKHOUSE_DATABASE
 from src.api.database import ClickHouseDB
 from src.api.models.member import CrossrefMember
 from src.api.models.work import CreativeWork
@@ -36,11 +37,11 @@ ORDER BY w."member"
     return [row[0] for row in result.result_rows]
 
 
-def insert_members():
+def insert_members(database_name: str = CLICKHOUSE_DATABASE):
     # Set up the client for calling the Crossref API
     client = Client()
     # Set up a connection to the ClickHouse database
-    db = ClickHouseDB()
+    db = ClickHouseDB(database_name=database_name)
     # Affirm that the table for inserting values is created
     db.create_table(CrossrefMember)
 
