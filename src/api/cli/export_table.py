@@ -104,7 +104,7 @@ def write_pyarrow_table_to_parquet(pyarrow_table: pa.Table, fp: Path) -> None:
     pq.write_table(pyarrow_table, fp)
 
 
-def export_table(table_choice: str, outfile: str):
+def export_table(table_choice: str, outfile: str, database: str):
     if table_choice == Works.choice:
         table = Works.table
     elif table_choice == Members.choice:
@@ -113,6 +113,6 @@ def export_table(table_choice: str, outfile: str):
         raise ValueError("This table is not yet implemented")
 
     fp = make_sure_outfile_is_parquet(outfile=outfile)
-    db = ClickHouseDB()
+    db = ClickHouseDB(database_name=database)
     selection = fetch_unique_rows_in_pyarrow(table=table, db=db)
     write_pyarrow_table_to_parquet(pyarrow_table=selection, fp=fp)

@@ -63,8 +63,14 @@ def works(mailto, samples, has_references, database):
     type=click.Path(file_okay=True, dir_okay=False),
     required=True,
 )
-def export(table: str, outfile: str):
-    export_table(table_choice=table, outfile=outfile)
+@click.option(
+    "--database",
+    type=click.STRING,
+    default=CLICKHOUSE_DATABASE,
+    show_default=True,
+)
+def export(table: str, outfile: str, database: str):
+    export_table(table_choice=table, outfile=outfile, database=database)
 
 
 if __name__ == "__main__":
