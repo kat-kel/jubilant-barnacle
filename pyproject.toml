@@ -18,7 +18,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["black", "isort", "pytest"]
-jup = ["jupyterlab", "seaborn"]
+jup = ["jupyterlab", "seaborn", "statsmodels", "scipy"]
 
 [tool.setuptools.dynamic]
 version = {attr = "src.VERSION"}
