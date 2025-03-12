@@ -94,20 +94,16 @@ Collecting members ━━━━━━━━━╺━━━  750/1000 0:17:43
 
 The data inserted into the ClickHouse database is stored in a folder where the software was installed. Specifically, ClickHouse local creates a symbolic link from a table's directory in `data/` to binary files in the `store/`.
 
-```shell
-clickhouse/data/crossref/creativework/ -> clickhouse/store/8ca/8cac4d5e-620a-4ee0-9dc3-6199fdefc23f
-```
-
 In case we uninstall / delete the ClickHouse local software, and thus delete the `data/` and `/store` folders, we need to back up our data.
 
 Run the export command for each table, specifying the name and location of the parquet file with which you want to work during the data analysis.
 
 ```shell
-crossref-api export-parquet --table creativework --outfile ./sampled-data/works.parquet
+crossref-api export-parquet --table works --outfile ./sampled-data/works.parquet
 ```
 
 ```shell
-crossref-api export-parquet --table member --outfile ./sampled-data/members.parquet
+crossref-api export-parquet --table members --outfile ./sampled-data/members.parquet
 ```
 
 ## Analyse data
